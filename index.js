@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 // pass:bjqZUGVNUOUcNP3P
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zf9ug.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -50,10 +50,18 @@ const run = async() =>{
       })
 
       app.get('/productsCount', async(req, res) =>{
-          const query ={}; 
-          const cursor = productCollection.find(query);
-          const count = await cursor.count();
+          const count = await productCollection.estimatedDocumentCount();
           res.send({count});
+      });
+
+      app.post('/productsById', async (req, res)=>{
+          const keys = req.body;
+          const ids = keys.map(id => ObjectId(id))
+          console.log(keys);
+          const query = {_id: {$in: ids}}
+          const cursor = productCollection.find(query);
+          const products = await cursor.toArray();
+          res.send(products);
       })
 
 
