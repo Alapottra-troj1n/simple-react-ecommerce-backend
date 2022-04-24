@@ -28,10 +28,32 @@ const run = async() =>{
       const productCollection = database.collection('product-collection');
 
       app.get('/products', async(req, res) =>{
+          
+        //getting query details from client side
+          const page = parseInt(req.query.page);
+          const size = parseInt(req.query.size);
+        
           const query = {};
           const cursor = productCollection.find(query);
-          const products = await cursor.toArray();
+          let products;
+
+          //pagination
+          if(page || size){
+            products = await cursor.skip(page * size).limit(size).toArray();
+
+          }else{
+           
+            products = await cursor.toArray();
+          }
+         
           res.send(products)
+      })
+
+      app.get('/productsCount', async(req, res) =>{
+          const query ={}; 
+          const cursor = productCollection.find(query);
+          const count = await cursor.count();
+          res.send({count});
       })
 
 
