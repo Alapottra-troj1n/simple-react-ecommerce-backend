@@ -55,6 +55,7 @@ const run = async() =>{
       });
 
       app.post('/productsById', async (req, res)=>{
+        //had to use post method because in the body we have to store a array that contains the key of specific products that were added to cart in the client side
           const keys = req.body;
           const ids = keys.map(id => ObjectId(id))
           console.log(keys);
@@ -79,7 +80,9 @@ run().catch(console.dir)
 
 
 
-
+app.get('/', (req, res) =>{
+  res.send('Server Working ')
+})
 
 
 
